@@ -1,17 +1,22 @@
 <script setup lang="ts">
-import PokemonCard from "@/components/PokemonCard.vue";
 
-import axios from 'axios'
-import { useAxios } from '@vueuse/integrations/useAxios'
-import {Pokemon} from "@/typedef/pokemon";
+import axios from "axios";
 
-const instance = axios.create({
-  baseURL: 'https://pokeapi.co/api/v2',
+import {onMounted} from "vue";
+import {useStorage} from "@vueuse/core";
+
+onMounted(()=> {
+  getPokemon()
 })
 
-const { data: pokemonData, isFinished } = useAxios('/pokemon', { method: 'GET' }, instance)
-
-let pokemons: Pokemon[] = []
+async function getPokemon() {
+  try {
+    const response = await axios.get('https://pokeapi.co/api/v2/pokemon/2')
+    let pokemonName = response.data.name
+  } catch (error) {
+    console.error(error)
+  }
+}
 
 </script>
 
@@ -24,7 +29,7 @@ let pokemons: Pokemon[] = []
             <v-switch label="Switch" inset></v-switch>
             <v-img height="2em" src="./assets/pokedex.png"></v-img>
             <v-icon
-              icon="mdi-github"
+                icon="mdi-github"
             ></v-icon>
           </v-col>
         </v-row>
@@ -35,44 +40,53 @@ let pokemons: Pokemon[] = []
         <v-row>
           <v-col>
             <v-autocomplete
-              clearable
-              label="Regions"
-              :items="['Kanto (1-151)', 'Johto (152-251)', 'Hoenn (252-386)', 'Sinnoh (387-494)', 'Unova (495-649)', 'Kalos (650-721)', 'Alola (722-809)', 'Galar (810-898)']"
-              multiple
+                clearable
+                label="Regions"
+                :items="['Kanto (1-151)', 'Johto (152-251)', 'Hoenn (252-386)', 'Sinnoh (387-494)', 'Unova (495-649)', 'Kalos (650-721)', 'Alola (722-809)', 'Galar (810-898)']"
+                multiple
             ></v-autocomplete>
           </v-col>
           <v-col>
             <v-autocomplete
-              clearable
-              label="Types"
-              :items="['Grass', 'Bug', 'Dark', 'Dragon', 'Electric', 'Fairy', 'Fighting', 'Fire', 'Flying', 'Ghost', 'Ground', 'Ice', 'Normal', 'Poison', 'Psychic', 'Rock', 'Steel', 'Water']"
-              multiple
+                clearable
+                label="Types"
+                :items="['Grass', 'Bug', 'Dark', 'Dragon', 'Electric', 'Fairy', 'Fighting', 'Fire', 'Flying', 'Ghost', 'Ground', 'Ice', 'Normal', 'Poison', 'Psychic', 'Rock', 'Steel', 'Water']"
+                multiple
             ></v-autocomplete>
           </v-col>
           <v-col>
             <v-autocomplete
-              clearable
-              label="Sort by"
-              :items="['Name', 'ID']"
-              multiple
+                clearable
+                label="Sort by"
+                :items="['Name', 'ID']"
+                multiple
             ></v-autocomplete>
           </v-col>
           <v-col>
             <v-autocomplete
-              class="flex-full-width"
-              density="comfortable"
-              menu-icon=""
-              placeholder="Search a Pokemon"
-              prepend-inner-icon="mdi-magnify"
-              rounded
-              theme="light"
-              variant="solo"
+                class="flex-full-width"
+                density="comfortable"
+                menu-icon=""
+                placeholder="Search a Pokemon"
+                prepend-inner-icon="mdi-magnify"
+                rounded
+                theme="light"
+                variant="solo"
             ></v-autocomplete>
           </v-col>
         </v-row>
       </v-container>
       <v-container>
-        <PokemonCard v-for="(pokemon, index) in pokemons" :key="index" :pokemon="pokemon"></PokemonCard>
+        <v-card class="mx-auto" max-width="344">
+          <v-card-title>{{ getPokemon }}</v-card-title>
+          <v-card-subtitle></v-card-subtitle>
+          <v-icon></v-icon>
+          <v-card-actions>
+            <v-btn color="orange-lighten-2" variant="text">
+              Infos
+            </v-btn>
+          </v-card-actions>
+        </v-card>
       </v-container>
     </v-main>
   </v-app>
