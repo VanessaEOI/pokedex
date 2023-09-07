@@ -12,7 +12,7 @@ onMounted(()=> {
 async function getPokemon() {
   try {
     const response = await axios.get('https://pokeapi.co/api/v2/pokemon/2')
-    let pokemonName = response.data.name
+    console.log(response.data.name)
   } catch (error) {
     console.error(error)
   }
@@ -78,7 +78,7 @@ async function getPokemon() {
       </v-container>
       <v-container>
         <v-card class="mx-auto" max-width="344">
-          <v-card-title>{{ getPokemon }}</v-card-title>
+          <v-card-title></v-card-title>
           <v-card-subtitle></v-card-subtitle>
           <v-icon></v-icon>
           <v-card-actions>
