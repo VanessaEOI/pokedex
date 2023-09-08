@@ -2,8 +2,9 @@
 import axios from "axios"
 import {onMounted, ref} from "vue"
 import PokemonCard from "@/components/PokemonCard.vue";
+import {Pokemon} from "@/typedef/pokemon";
 
-const pokemons = ref([])
+const pokemons = ref<Pokemon[]>([])
 const pokemonImg = ref('')
 
 onMounted(() => {
@@ -12,7 +13,7 @@ onMounted(() => {
 
 async function getAllPokemons() {
   try {
-    const response = await axios.get('https://pokeapi.co/api/v2/pokemon?limit=1000')
+    const response = await axios.get<{results: Pokemon[]}>('https://pokeapi.co/api/v2/pokemon?limit=20')
     pokemons.value = response.data.results
     pokemonImg.value = 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/dream-world/'
     console.log(response.data)
