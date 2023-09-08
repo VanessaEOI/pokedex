@@ -2,8 +2,12 @@
 
 import axios from "axios";
 
-import {onMounted} from "vue";
-import {useStorage} from "@vueuse/core";
+import {onMounted, ref} from "vue";
+
+const pokemonName = ref('')
+const pokemonId = ref('')
+const pokemonImg = ref('')
+const pokemonTypes = ref([])
 
 onMounted(()=> {
   getPokemon()
@@ -12,7 +16,11 @@ onMounted(()=> {
 async function getPokemon() {
   try {
     const response = await axios.get('https://pokeapi.co/api/v2/pokemon/2')
-    console.log(response.data.name)
+      pokemonName.value = response.data.name
+      pokemonId.value = response.data.id
+      pokemonImg.value = response.data.sprites.other.dream_world.front_default
+      pokemonTypes.value = response.data.types
+      console.log(response.data)
   } catch (error) {
     console.error(error)
   }
@@ -78,8 +86,10 @@ async function getPokemon() {
       </v-container>
       <v-container>
         <v-card class="mx-auto" max-width="344">
-          <v-card-title></v-card-title>
-          <v-card-subtitle></v-card-subtitle>
+            <v-card-subtitle>{{ pokemonId }}</v-card-subtitle>
+            <v-card-title>{{ pokemonName }}</v-card-title>
+            <v-img :src="pokemonImg"></v-img>
+            <v-card-text v-for="(type, index) in pokemonTypes" :key="index">{{ type.type.name }}</v-card-text>
           <v-icon></v-icon>
           <v-card-actions>
             <v-btn color="orange-lighten-2" variant="text">
