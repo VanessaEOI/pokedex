@@ -1,30 +1,29 @@
 <script setup lang="ts">
 
-import axios from "axios";
+import axios from "axios"
 
-import {onMounted, ref} from "vue";
+import {onMounted, ref} from "vue"
 
-const pokemonName = ref('')
-const pokemonId = ref('')
+const pokemons = ref([])
 const pokemonImg = ref('')
 const pokemonTypes = ref([])
 
-onMounted(()=> {
-  getPokemon()
+onMounted(() => {
+  getAllPokemons()
 })
 
-async function getPokemon() {
+async function getAllPokemons() {
   try {
-    const response = await axios.get('https://pokeapi.co/api/v2/pokemon/2')
-      pokemonName.value = response.data.name
-      pokemonId.value = response.data.id
-      pokemonImg.value = response.data.sprites.other.dream_world.front_default
-      pokemonTypes.value = response.data.types
-      console.log(response.data)
+    const response = await axios.get('https://pokeapi.co/api/v2/pokemon')
+    pokemons.value = response.data.results
+    pokemonImg.value = response.data.sprites.other.dream_world.front_default
+    pokemonTypes.value = response.data.types;
+    console.log(response.data)
   } catch (error) {
     console.error(error)
   }
 }
+
 
 </script>
 
@@ -84,12 +83,18 @@ async function getPokemon() {
           </v-col>
         </v-row>
       </v-container>
-      <v-container>
-        <v-card class="mx-auto" max-width="344">
-            <v-card-subtitle>{{ pokemonId }}</v-card-subtitle>
-            <v-card-title>{{ pokemonName }}</v-card-title>
-            <v-img :src="pokemonImg"></v-img>
-            <v-card-text v-for="(type, index) in pokemonTypes" :key="index">{{ type.type.name }}</v-card-text>
+      <v-container class="d-flex flex-wrap">
+        <v-card v-for="(pokemon, index) in pokemons" :key=index class="v-col-3 mx-auto" max-width="344">
+          <v-card-title>{{ pokemon.name }}</v-card-title>
+          <v-card-subtitle>ID: {{ index + 1 }}</v-card-subtitle>
+          <v-img
+              :src="`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/dream-world/${index + 1}.svg`"></v-img>
+          <v-card-text>Type(s):
+            <span v-for="(type, typeIndex) in pokemon.types" :key="typeIndex">
+      {{ type.type.name }}
+      <span v-if="typeIndex < pokemon.types.length - 1">, </span>
+    </span>
+          </v-card-text>
           <v-icon></v-icon>
           <v-card-actions>
             <v-btn color="orange-lighten-2" variant="text">
