@@ -13,12 +13,23 @@ onMounted(() => {
 
 async function getAllPokemons() {
   try {
-    const response = await axios.get<{results: Pokemon[]}>('https://pokeapi.co/api/v2/pokemon?limit=20')
+    const response = await axios.get<{ results: Pokemon[] }>('https://pokeapi.co/api/v2/pokemon?limit=20')
     pokemons.value = response.data.results
     pokemonImg.value = 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/dream-world/'
     console.log(response.data)
-  } catch (error) {
-    console.error(error)
+  } catch (error: any) {
+    const errorCode = error.response.status
+    switch (errorCode) {
+      case 404:
+        console.log("Pokémons introuvables !")
+        break
+      case 500:
+        console.log("Une erreur interne s'est produite")
+        break
+      default:
+        console.log("Une erreur inconnue s'est produite")
+        break
+    }
   }
 }
 
