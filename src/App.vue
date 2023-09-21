@@ -1,11 +1,23 @@
 <script setup lang="ts">
 import axios from "axios"
-import {onMounted, ref} from "vue"
-import PokemonCard from "@/components/PokemonCard.vue";
+import {computed, onMounted, ref} from "vue"
+import PokemonCard from "@/components/PokemonCard.vue"
 import {Pokemon} from "@/typedef/pokemon";
 
 const pokemons = ref<Pokemon[]>([])
 const pokemonImg = ref('')
+const searchText = ref('')
+
+const filteredPokemons = computed(() => {
+  const search = searchText.value.toLowerCase()
+  if (search === '') {
+    return pokemons.value;
+  } else {
+    return pokemons.value.filter((pokemon) =>
+        pokemon.name.toLowerCase().includes(search)
+    );
+  }
+})
 
 onMounted(() => {
   getAllPokemons()
@@ -13,7 +25,7 @@ onMounted(() => {
 
 async function getAllPokemons() {
   try {
-    const response = await axios.get<{ results: Pokemon[] }>('https://pokeapi.co/api/v2/pokemon?limit=20')
+    const response = await axios.get<{ results: Pokemon[] }>('https://pokeapi.co/api/v2/pokemon?limit=2000')
     pokemons.value = response.data.results
     pokemonImg.value = 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/dream-world/'
     console.log(response.data)
@@ -71,28 +83,22 @@ async function getAllPokemons() {
           </v-col>
           <v-col>
             <v-autocomplete
-                clearable
                 label="Sort by"
                 :items="['Name', 'ID']"
-                multiple
             ></v-autocomplete>
           </v-col>
           <v-col>
-            <v-autocomplete
-                class="flex-full-width"
-                density="comfortable"
-                menu-icon=""
-                placeholder="Search a Pokemon"
+            <v-text-field
+                placeholder="Search Pokemon"
                 prepend-inner-icon="mdi-magnify"
-                rounded
-                theme="light"
                 variant="solo"
-            ></v-autocomplete>
+                v-model="searchText"
+            ></v-text-field>
           </v-col>
         </v-row>
       </v-container>
       <v-container class="d-flex flex-wrap v-col-12">
-        <PokemonCard v-for="(pokemon, index) in pokemons"
+        <PokemonCard v-for="(pokemon, index) in filteredPokemons"
                      :key="index"
                      :pokemonId="index + 1"
                      :pokemonName="pokemon.name"
