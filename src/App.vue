@@ -2,20 +2,19 @@
 import axios from "axios"
 import {computed, onMounted, ref} from "vue"
 import PokemonCard from "@/components/PokemonCard.vue"
-import {Pokemon} from "@/typedef/pokemon";
+import {NamedAPIResource} from "@/typedef/utility";
 
-const pokemons = ref<Pokemon[]>([])
-const pokemonImg = ref('')
+const pokemons = ref<NamedAPIResource[]>([])
 const searchText = ref('')
 
 const filteredPokemons = computed(() => {
   const search = searchText.value.toLowerCase()
   if (search === '') {
-    return pokemons.value;
+    return pokemons.value
   } else {
     return pokemons.value.filter((pokemon) =>
         pokemon.name.toLowerCase().includes(search)
-    );
+    )
   }
 })
 
@@ -25,9 +24,8 @@ onMounted(() => {
 
 async function getAllPokemons() {
   try {
-    const response = await axios.get<{ results: Pokemon[] }>('https://pokeapi.co/api/v2/pokemon?limit=2000')
+    const response = await axios.get<{ results: NamedAPIResource[] }>('https://pokeapi.co/api/v2/pokemon?limit=20')
     pokemons.value = response.data.results
-    pokemonImg.value = 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/dream-world/'
     console.log(response.data)
   } catch (error: any) {
     const errorCode = error.response.status
@@ -98,12 +96,10 @@ async function getAllPokemons() {
         </v-row>
       </v-container>
       <v-container class="d-flex flex-wrap v-col-12">
-        <PokemonCard v-for="(pokemon, index) in filteredPokemons"
-                     :key="index"
-                     :pokemonId="index + 1"
+        <PokemonCard v-for="pokemon in filteredPokemons"
+                     :key="pokemon.name"
                      :pokemonName="pokemon.name"
-                     :pokemonImg="pokemonImg + (index + 1) + '.svg'">
-        </PokemonCard>
+        />
       </v-container>
     </v-main>
   </v-app>

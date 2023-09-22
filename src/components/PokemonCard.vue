@@ -1,9 +1,38 @@
 <script setup lang="ts">
+import {onMounted, ref} from "vue";
+import axios from "axios";
+import {Pokemon} from "@/typedef/pokemon";
+
+const pokemon = ref<Pokemon | null>(null)
 const props = defineProps<{
-  pokemonId: number,
   pokemonName: string,
-  pokemonImg: string
 }>()
+
+onMounted(() => {
+  getPokemon()
+})
+
+async function getPokemon() {
+  try {
+    const response = await axios.get<Pokemon>('https://pokeapi.co/api/v2/pokemon/' + props.pokemonName)
+    pokemon.value = response.data
+    console.log(response.data)
+  } catch (error: any) {
+    const errorCode = error.response.status
+    switch (errorCode) {
+      case 404:
+        console.log("Pokémons introuvables !")
+        break
+      case 500:
+        console.log("Une erreur interne s'est produite")
+        break
+      default:
+        console.log("Une erreur inconnue s'est produite")
+        break
+    }
+  }
+}
+
 </script>
 
 <template>
@@ -19,10 +48,10 @@ const props = defineProps<{
               height="fit-content">
         <v-card-item>
           <v-card-title>{{ pokemonName }}</v-card-title>
-          <v-card-subtitle>#{{ pokemonId }}</v-card-subtitle>
+          <v-card-subtitle>#{{ pokemon?.id }}</v-card-subtitle>
         </v-card-item>
         <v-img height="10em" class="ma-auto"
-               :src="pokemonImg">
+               :src="pokemon?.sprites?.front_default">
         </v-img>
       </v-card>
     </v-hover>
