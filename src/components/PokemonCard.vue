@@ -1,37 +1,23 @@
 <script setup lang="ts">
-import {onMounted, ref} from "vue";
-import axios from "axios";
-import {Pokemon} from "@/typedef/pokemon";
+import {onMounted, ref} from "vue"
+import {Pokemon} from "@/typedef/pokemon"
+import useFetchPokemon from "@/utils/fetchPokemon"
 
-const pokemon = ref<Pokemon | null>(null)
 const props = defineProps<{
   pokemonName: string,
 }>()
 
-onMounted(() => {
-  getPokemon()
-})
+const { fetchPokemon } = useFetchPokemon()
 
-async function getPokemon() {
-  try {
-    const response = await axios.get<Pokemon>('https://pokeapi.co/api/v2/pokemon/' + props.pokemonName)
-    pokemon.value = response.data
-    console.log(response.data)
-  } catch (error: any) {
-    const errorCode = error.response.status
-    switch (errorCode) {
-      case 404:
-        console.log("Pokémons introuvables !")
-        break
-      case 500:
-        console.log("Une erreur interne s'est produite")
-        break
-      default:
-        console.log("Une erreur inconnue s'est produite")
-        break
-    }
-  }
+const pokemon = ref<Pokemon | null>(null)
+
+async function load() {
+  pokemon.value = await fetchPokemon(props.pokemonName)
 }
+
+onMounted(async () => {
+  await load()
+})
 
 </script>
 
@@ -39,7 +25,7 @@ async function getPokemon() {
   <v-lazy :options="{'threshold':0.5}"
           transition="fade-transition"
           class="v-col-2">
-    <v-hover v-slot="{ isHovering, props }">
+    <v-hover v-slot="{ isHovering, props }" >
       <v-card class="mx-auto ma-2 pa-6 rounded-xl"
               max-width="344"
               :elevation="isHovering ? 12 : 2"

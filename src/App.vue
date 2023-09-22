@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import axios from "axios"
 import {computed, onMounted, ref} from "vue"
 import PokemonCard from "@/components/PokemonCard.vue"
+import useFetchAllPokemon from "@/utils/fetchAllPokemon"
 import {NamedAPIResource} from "@/typedef/utility";
 
 const pokemons = ref<NamedAPIResource[]>([])
@@ -18,30 +18,16 @@ const filteredPokemons = computed(() => {
   }
 })
 
-onMounted(() => {
-  getAllPokemons()
+const { fetchAllPokemon } = useFetchAllPokemon()
+
+async function loadAll() {
+  pokemons.value = await fetchAllPokemon()
+}
+
+onMounted(async () => {
+  await loadAll()
 })
 
-async function getAllPokemons() {
-  try {
-    const response = await axios.get<{ results: NamedAPIResource[] }>('https://pokeapi.co/api/v2/pokemon?limit=20')
-    pokemons.value = response.data.results
-    console.log(response.data)
-  } catch (error: any) {
-    const errorCode = error.response.status
-    switch (errorCode) {
-      case 404:
-        console.log("Pokémons introuvables !")
-        break
-      case 500:
-        console.log("Une erreur interne s'est produite")
-        break
-      default:
-        console.log("Une erreur inconnue s'est produite")
-        break
-    }
-  }
-}
 
 </script>
 
