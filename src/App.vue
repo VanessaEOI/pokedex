@@ -2,7 +2,7 @@
 import {computed, onMounted, ref} from "vue"
 import PokemonCard from "@/components/PokemonCard.vue"
 import useFetchAllPokemon from "@/utils/fetchAllPokemon"
-import {NamedAPIResource} from "@/typedef/utility";
+import {NamedAPIResource} from "@/typedef/utility"
 
 const pokemons = ref<NamedAPIResource[]>([])
 const searchText = ref('')
