@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import {computed, onMounted, ref} from "vue"
 import PokemonCard from "@/components/PokemonCard.vue"
-import useFetchAllPokemon from "@/utils/fetchAllPokemon"
 import {NamedAPIResource} from "@/typedef/utility"
+import useFetchPageUrl from "@/utils/fetchPageUrl"
 
 const pokemons = ref<NamedAPIResource[]>([])
 const searchText = ref('')
@@ -18,14 +18,14 @@ const filteredPokemons = computed(() => {
   }
 })
 
-const { fetchAllPokemon } = useFetchAllPokemon()
+const { fetchPageUrl } = useFetchPageUrl()
 
-async function loadAll() {
-  pokemons.value = await fetchAllPokemon()
+async function loadPages() {
+  pokemons.value = await fetchPageUrl('')
 }
 
 onMounted(async () => {
-  await loadAll()
+  await loadPages()
 })
 
 
