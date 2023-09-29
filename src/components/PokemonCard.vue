@@ -24,7 +24,7 @@ onMounted(async () => {
 <template>
   <v-lazy :options="{'threshold':0.5}"
           transition="fade-transition"
-          class="v-col-2">
+          class="v-col-3">
     <v-hover v-slot="{ isHovering, props }" >
       <v-card class="mx-auto ma-2 pa-6 rounded-xl"
               max-width="344"

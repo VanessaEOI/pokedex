@@ -1,33 +1,30 @@
 <script setup lang="ts">
-import {computed, onMounted, ref} from "vue"
+import {onMounted, ref} from "vue"
 import PokemonCard from "@/components/PokemonCard.vue"
 import {NamedAPIResource} from "@/typedef/utility"
-import useFetchPageUrl from "@/utils/fetchPageUrl"
+import usePokemonList from "@/utils/usePokemonList"
 
 const pokemons = ref<NamedAPIResource[]>([])
 const searchText = ref('')
+const nextUrl = ref<NamedAPIResource[]>([])
 
-const filteredPokemons = computed(() => {
-  const search = searchText.value.toLowerCase()
-  if (search === '') {
-    return pokemons.value
-  } else {
-    return pokemons.value.filter((pokemon) =>
-        pokemon.name.toLowerCase().includes(search)
-    )
-  }
-})
-
-const { fetchPageUrl } = useFetchPageUrl()
+const {fetchPage} = usePokemonList()
 
 async function loadPages() {
-  pokemons.value = await fetchPageUrl('')
+  pokemons.value = await fetchPage()
+  nextUrl.value = await fetchPage(true)
 }
 
 onMounted(async () => {
   await loadPages()
 })
 
+const loadMore = async () => {
+  if (nextUrl.value) {
+    const nextPageData = await fetchPage(true)
+    pokemons.value = pokemons.value.concat(nextPageData)
+  }
+}
 
 </script>
 
@@ -40,7 +37,7 @@ onMounted(async () => {
             <v-switch label="Switch" inset></v-switch>
             <v-img height="2em" src="./assets/pokedex.png"></v-img>
             <v-icon
-                icon="mdi-github"
+              icon="mdi-github"
             ></v-icon>
           </v-col>
         </v-row>
@@ -51,41 +48,46 @@ onMounted(async () => {
         <v-row>
           <v-col>
             <v-autocomplete
-                clearable
-                label="Regions"
-                :items="['Kanto (1-151)', 'Johto (152-251)', 'Hoenn (252-386)', 'Sinnoh (387-494)', 'Unova (495-649)', 'Kalos (650-721)', 'Alola (722-809)', 'Galar (810-898)']"
-                multiple
+              clearable
+              label="Regions"
+              :items="['Kanto (1-151)', 'Johto (152-251)', 'Hoenn (252-386)', 'Sinnoh (387-494)', 'Unova (495-649)', 'Kalos (650-721)', 'Alola (722-809)', 'Galar (810-898)']"
+              multiple
             ></v-autocomplete>
           </v-col>
           <v-col>
             <v-autocomplete
-                clearable
-                label="Types"
-                :items="['Grass', 'Bug', 'Dark', 'Dragon', 'Electric', 'Fairy', 'Fighting', 'Fire', 'Flying', 'Ghost', 'Ground', 'Ice', 'Normal', 'Poison', 'Psychic', 'Rock', 'Steel', 'Water']"
-                multiple
+              clearable
+              label="Types"
+              :items="['Grass', 'Bug', 'Dark', 'Dragon', 'Electric', 'Fairy', 'Fighting', 'Fire', 'Flying', 'Ghost', 'Ground', 'Ice', 'Normal', 'Poison', 'Psychic', 'Rock', 'Steel', 'Water']"
+              multiple
             ></v-autocomplete>
           </v-col>
           <v-col>
             <v-autocomplete
-                label="Sort by"
-                :items="['Name', 'ID']"
+              label="Sort by"
+              :items="['Name', 'ID']"
             ></v-autocomplete>
           </v-col>
           <v-col>
             <v-text-field
-                placeholder="Search Pokemon"
-                prepend-inner-icon="mdi-magnify"
-                variant="solo"
-                v-model="searchText"
+              placeholder="Search Pokemon"
+              prepend-inner-icon="mdi-magnify"
+              variant="solo"
+              v-model="searchText"
             ></v-text-field>
           </v-col>
         </v-row>
       </v-container>
-      <v-container class="d-flex flex-wrap v-col-12">
-        <PokemonCard v-for="pokemon in filteredPokemons"
+      <v-container class="d-flex flex-wrap v-col-10">
+        <PokemonCard v-for="pokemon in pokemons"
                      :key="pokemon.name"
                      :pokemonName="pokemon.name"
         />
+      </v-container>
+      <v-container class="d-flex justify-center">
+        <v-btn @click="loadMore">
+          Load more
+        </v-btn>
       </v-container>
     </v-main>
   </v-app>
